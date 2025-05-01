@@ -1,3 +1,89 @@
-body { font-family: sans-serif; padding: 2rem; max-width: 600px; margin: auto; }
-input, select, button { margin: 0.5rem 0; display: block; }
-#result { margin-top: 1rem; }
+/* Общие сбросы */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Шрифт и фон */
+  body {
+    font-family: sans-serif;
+    background: #f9f9f9;
+    color: #333;
+    line-height: 1.4;
+  }
+  
+  /* Шапка */
+  .site-header {
+    background: #004d99;
+    padding: 0.5rem 1rem;
+  }
+  .site-nav {
+    display: flex;
+    gap: 1rem;
+  }
+  .site-nav__link {
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  .site-nav__link:hover,
+  .site-nav__link.active {
+    text-decoration: underline;
+  }
+  
+  /* Основной контент */
+  .site-content {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 1rem;
+    background: #fff;
+    border-radius: 4px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  }
+  
+  /* Формы */
+  form {
+    display: grid;
+    gap: 0.75rem;
+  }
+  input, select, button {
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  button {
+    background: #004d99;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+  }
+  button:hover {
+    background: #003366;
+  }
+  
+  /* Результаты */
+  #result, #resize-result, #file-result, #unit-result, #currency-result {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #eef;
+    border-radius: 4px;
+    word-break: break-word;
+  }
+  
+  /* Футер */
+  .site-footer {
+    text-align: center;
+    font-size: 0.875rem;
+    color: #666;
+    margin: 2rem 0;
+  }
+  .site-footer a {
+    color: #004d99;
+    text-decoration: none;
+  }
+  .site-footer a:hover {
+    text-decoration: underline;
+  }
+  

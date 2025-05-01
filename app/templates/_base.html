@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ title or "Web Converter" }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}" />
+</head>
+<body>
+  <header class="site-header">
+    <nav class="site-nav">
+      <a href="/"       class="site-nav__link">Image</a>
+      <a href="/resize" class="site-nav__link">Resize</a>
+      <a href="/file"   class="site-nav__link">DOCX→PDF</a>
+      <a href="/units"  class="site-nav__link">Units</a>
+      <a href="/currency" class="site-nav__link">Currency</a>
+    </nav>
+  </header>
+
+  <main class="site-content">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <p>© 2025 Web Converter · <a href="https://github.com/ivoshchikov/web-converter" target="_blank">GitHub</a></p>
+  </footer>
+</body>
+</html>
