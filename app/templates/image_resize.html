@@ -1,20 +1,29 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Image Resize</title>
-  <link rel="stylesheet" href="/static/css/style.css" />
-</head>
-<body>
+{% extends "_base.html" %}
+{% set title = "Изменить размер изображения" %}
+
+{% block content %}
   <h1>Изменить размер изображения</h1>
-  <form id="resize-form">
-    <input type="file" name="file" accept="image/*" required />
-    <input type="number" name="width" placeholder="Ширина (px)" required />
-    <input type="number" name="height" placeholder="Высота (px)" required />
+  <form id="resize-form" enctype="multipart/form-data">
+    <input
+      type="file"
+      name="file"
+      accept="image/*"
+      required
+    />
+    <input
+      type="number"
+      name="width"
+      placeholder="Ширина (px)"
+      required
+    />
+    <input
+      type="number"
+      name="height"
+      placeholder="Высота (px)"
+      required
+    />
     <button type="submit">Изменить размер</button>
   </form>
   <div id="resize-result"></div>
-  <script src="/static/js/image_resize.js"></script>
-</body>
-</html>
+  <script src="{{ url_for('static', path='js/image_resize.js') }}"></script>
+{% endblock %}
