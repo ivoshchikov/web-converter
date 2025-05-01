@@ -59,6 +59,11 @@ jobs:
   deploy-cloudrun:
     needs: publish
     runs-on: ubuntu-latest
+
+    # задаём IMAGE как переменную окружения job'а
+    env:
+      IMAGE: ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/web-converter-repo/web-converter:latest
+
     steps:
       - uses: actions/checkout@v3
 
@@ -73,7 +78,6 @@ jobs:
 
       - name: Build & push image
         run: |
-          IMAGE="${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/web-converter-repo/web-converter:latest"
           docker build . --tag $IMAGE
           docker push $IMAGE
 
@@ -82,5 +86,5 @@ jobs:
         with:
           service: web-converter-service
           region: ${{ secrets.GCP_REGION }}
-          image: $IMAGE
+          image: ${{ env.IMAGE }}
           project_id: ${{ secrets.GCP_PROJECT }}
