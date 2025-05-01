@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Image Converter</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+  <h1>Конвертер изображений</h1>
+  <form id="convert-form">
+    <input type="file" id="file-input" name="file" accept="image/*" required />
+    <select id="format-select" name="target_format">
+      <option value="jpeg">JPEG</option>
+      <option value="png">PNG</option>
+      <option value="webp" selected>WebP</option>
+    </select>
+    <button type="submit">Конвертировать</button>
+  </form>
+  <div id="result"></div>
+
+  <script src="/static/js/image_convert.js"></script>
+</body>
+</html>
