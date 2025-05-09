@@ -7,24 +7,26 @@
   <div class="panel panel--files" id="files-panel">
     <h2>Исходные файлы</h2>
 
-    <!-- Drag-n-Drop-зона  -->
+    <!-- Drag-&-Drop зона -->
     <div id="drop-zone" class="drop-zone">
-      <p>Перетащите сюда файлы<br>или кликните, чтобы выбрать</p>
-      <input type="file" id="file-input" name="files"
+      <p>Перетащите сюда изображения<br>или кликните, чтобы выбрать</p>
+      <input type="file"
+             id="file-input"
+             name="files"
              accept="image/*"
              multiple
-             style="display:none">
+             hidden>
     </div>
 
+    <button id="clear-list" class="btn-secondary" style="display:none">Очистить список</button>
     <ul id="files-list"></ul>
   </div>
 
   <!-- -------- средняя колонка -------- -->
   <div class="panel panel--settings" id="settings-panel">
-    <h2>Параметры конвертации</h2>
+    <h2>Параметры</h2>
 
-    <label>
-      Формат<br>
+    <label>Формат<br>
       <select id="format-select" name="target_format">
         <option value="jpeg">JPEG</option>
         <option value="png">PNG</option>
@@ -34,16 +36,14 @@
       </select>
     </label>
 
-    <label>
-      Качество (1–100)<br>
-      <input type="number" id="quality-input"
-             name="quality" min="1" max="100" value="80">
+    <label>Качество (1–100)<br>
+      <input type="number" id="quality-input" name="quality" min="1" max="100" value="80">
     </label>
 
     <button id="convert-button">Конвертировать</button>
 
-    <!-- общий прогресс -->
-    <progress id="total-progress" value="0" max="100" style="width:100%;margin-top:1rem;display:none"></progress>
+    <progress id="total-progress" value="0" max="100"
+              style="width:100%;margin-top:1rem;display:none"></progress>
   </div>
 
   <!-- -------- правая колонка -------- -->
