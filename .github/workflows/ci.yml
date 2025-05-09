@@ -76,15 +76,19 @@ jobs:
         run: |
           gcloud auth configure-docker ${{ secrets.GCP_REGION }}-docker.pkg.dev
 
-      - name: Build & push image
-        run: |
-          docker build . --tag $IMAGE
-          docker push $IMAGE
-
+      # ---------- ваш существующий job ----------
+      - name: Build & Push
+        uses: google-github-actions/build-push-action@v1
+        with:
+          push: true
+          tags: |
+            ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/web-converter-repo/web-converter:${{ github.sha }}
+            ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/web-converter-repo/web-converter:latest   # 🆕 добавили
+      
+      # ---------- деплой ----------
       - name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v1
         with:
           service: web-converter-service
-          region: ${{ secrets.GCP_REGION }}
-          image: ${{ env.IMAGE }}
-          project_id: ${{ secrets.GCP_PROJECT }}
+          region: ${{ env.REGION }}
+          image: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/web-converter-repo/web-converter:latest   
