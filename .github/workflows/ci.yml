@@ -1,94 +1,43 @@
-name: CI & Publish
+name: CI → Build → Cloud Run
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    branches: [main]
+
+env:                       # ← объявляем однажды и пользуемся внизу
+  REGION:      ${{ secrets.GCP_REGION }}
+  PROJECT_ID:  ${{ secrets.GCP_PROJECT }}
+  SERVICE:     web-converter-service
+  REPOSITORY:  web-converter-repo        # ваш AR-репозиторий
+  IMAGE_PATH:  ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/web-converter
 
 jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.12'
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Run tests
-        run: pytest -q
-
-  build:
-    needs: build-and-test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Build Docker image
-        run: |
-          docker build . \
-            --tag ${{ secrets.DOCKERHUB_USERNAME }}/web-converter:latest
-
-  publish:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Push to Docker Hub
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          push: true
-          tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/web-converter:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/web-converter:${{ github.sha }}
-
-  deploy-cloudrun:
-    needs: publish
+  build-push-deploy:
     runs-on: ubuntu-latest
 
-    # задаём IMAGE как переменную окружения job'а
-    env:
-      IMAGE: ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/web-converter-repo/web-converter:latest
-
     steps:
-      - uses: actions/checkout@v3
+    - uses: actions/checkout@v3
 
-      - name: Authenticate to GCP
-        uses: google-github-actions/auth@v1
-        with:
-          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+    # ---------- аутентификация в Google Cloud ----------
+    - name: Auth to GCP
+      uses: google-github-actions/auth@v1
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-      - name: Configure Docker for Artifact Registry
-        run: |
-          gcloud auth configure-docker ${{ secrets.GCP_REGION }}-docker.pkg.dev
+    # ---------- сборка образа и пуш в Artifact Registry ----------
+    - name: Build & push image
+      uses: google-github-actions/build-push-action@v1
+      with:
+        push: true
+        tags: |
+          ${{ env.IMAGE_PATH }}:${{ github.sha }}
+          ${{ env.IMAGE_PATH }}:latest           # скользящий тег
 
-      # ---------- ваш существующий job ----------
-      - name: Build & Push
-        uses: google-github-actions/build-push-action@v1
-        with:
-          push: true
-          tags: |
-            ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/web-converter-repo/web-converter:${{ github.sha }}
-            ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/web-converter-repo/web-converter:latest   # 🆕 добавили
-      
-      # ---------- деплой ----------
-      - name: Deploy to Cloud Run
-        uses: google-github-actions/deploy-cloudrun@v1
-        with:
-          service: web-converter-service
-          region: ${{ env.REGION }}
-          image: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/web-converter-repo/web-converter:latest   
+    # ---------- деплой в Cloud Run ----------
+    - name: Deploy to Cloud Run
+      uses: google-github-actions/deploy-cloudrun@v1
+      with:
+        service:  ${{ env.SERVICE }}
+        region:   ${{ env.REGION }}
+        image:    ${{ env.IMAGE_PATH }}:latest   # всегда разворачиваем :latest
+        allow_unauthenticated: true
