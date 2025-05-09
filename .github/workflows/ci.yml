@@ -2,15 +2,14 @@ name: CI → Build → Cloud Run
 
 on:
   push:
-    branches:
-      - main                     # каждый push в main триггерит workflow
+    branches: [ main ]
 
-# ▸ переменные, которые будут доступны во ВСЕХ job-ах/шагах
-env:
-  REGION:      ${{ secrets.GCP_REGION }}          # пример: us-central1
-  PROJECT_ID:  ${{ secrets.GCP_PROJECT }}         # пример: burnished-yeti-406022
-  SERVICE:     web-converter-service              # имя Cloud Run-сервиса
-  REPOSITORY:  web-converter-repo                 # Artifact Registry repo (Docker)
+env:                       # глобальные переменные
+  REGION:      ${{ secrets.GCP_REGION }}             # ex: us-central1
+  PROJECT_ID:  ${{ secrets.GCP_PROJECT }}            # ex: burnished-yeti-406022
+  SERVICE:     web-converter-service                 # Cloud Run service
+  REPOSITORY:  web-converter-repo                    # Artifact Registry repo
+  IMAGE_URI:   ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/web-converter-repo/web-converter
 
 jobs:
   build-push-deploy:
@@ -19,20 +18,26 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    # ---------- аутентификация в Google Cloud ----------
+    # ---------- авторизация в Google Cloud ----------
     - name: Auth to Google Cloud
       uses: google-github-actions/auth@v1
       with:
         credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-    # ---------- сборка образа и push в Artifact Registry ----------
-    - name: Build & push image
-      uses: google-github-actions/build-push-action@v1
+    # ---------- настраиваем docker на Artifact Registry ----------
+    - name: Configure docker for Artifact Registry
+      run: |
+        gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
+
+    # ---------- build & push (два тега: sha и latest) ----------
+    - name: Build and push image to Artifact Registry
+      uses: docker/build-push-action@v4
       with:
+        context: .
         push: true
         tags: |
-          ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/web-converter:${{ github.sha }}
-          ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/web-converter:latest   # «скользящий» тег
+          ${{ env.IMAGE_URI }}:${{ github.sha }}
+          ${{ env.IMAGE_URI }}:latest
 
     # ---------- деплой в Cloud Run ----------
     - name: Deploy to Cloud Run
@@ -40,5 +45,5 @@ jobs:
       with:
         service:  ${{ env.SERVICE }}
         region:   ${{ env.REGION }}
-        image:    ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/web-converter:latest
+        image:    ${{ env.IMAGE_URI }}:latest
         allow_unauthenticated: true
