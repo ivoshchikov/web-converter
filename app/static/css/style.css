@@ -157,3 +157,26 @@
     .image-convert-container .panel { flex: 1 1 100%; }
   }
   
+  /* ---------- Drag-and-Drop zone ---------- */
+.drop-zone {
+    border: 2px dashed #bbb;
+    border-radius: .5rem;
+    padding: 1.5rem .75rem;
+    text-align: center;
+    cursor: pointer;
+    transition: background .2s ease;
+  }
+  .drop-zone.drag-over {
+    background: #eef;
+    border-color: #004d99;
+  }
+  
+  /* progress-bar */
+  progress {
+    appearance: none;
+    width: 100%;
+    height: 10px;
+  }
+  progress::-webkit-progress-bar { background:#eee; border-radius:5px; }
+  progress::-webkit-progress-value { background:#004d99; border-radius:5px; }
+  

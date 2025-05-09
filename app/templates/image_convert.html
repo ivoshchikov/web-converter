@@ -3,16 +3,28 @@
 
 {% block content %}
 <div class="image-convert-container">
+  <!-- -------- левая колонка -------- -->
   <div class="panel panel--files" id="files-panel">
     <h2>Исходные файлы</h2>
-    <input type="file" id="file-input" name="files" accept="image/*" multiple />
+
+    <!-- Drag-n-Drop-зона  -->
+    <div id="drop-zone" class="drop-zone">
+      <p>Перетащите сюда файлы<br>или кликните, чтобы выбрать</p>
+      <input type="file" id="file-input" name="files"
+             accept="image/*"
+             multiple
+             style="display:none">
+    </div>
+
     <ul id="files-list"></ul>
   </div>
 
+  <!-- -------- средняя колонка -------- -->
   <div class="panel panel--settings" id="settings-panel">
     <h2>Параметры конвертации</h2>
+
     <label>
-      Формат
+      Формат<br>
       <select id="format-select" name="target_format">
         <option value="jpeg">JPEG</option>
         <option value="png">PNG</option>
@@ -21,13 +33,20 @@
         <option value="tiff">TIFF</option>
       </select>
     </label>
+
     <label>
-      Качество (1–100)
-      <input type="number" id="quality-input" name="quality" min="1" max="100" value="80" />
+      Качество (1–100)<br>
+      <input type="number" id="quality-input"
+             name="quality" min="1" max="100" value="80">
     </label>
+
     <button id="convert-button">Конвертировать</button>
+
+    <!-- общий прогресс -->
+    <progress id="total-progress" value="0" max="100" style="width:100%;margin-top:1rem;display:none"></progress>
   </div>
 
+  <!-- -------- правая колонка -------- -->
   <div class="panel panel--results" id="results-panel">
     <h2>Результаты</h2>
     <ul id="results-list"></ul>
@@ -35,8 +54,8 @@
   </div>
 </div>
 
-<!-- JSZip для сборки ZIP-архива -->
+<!-- JSZip -->
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.0/dist/jszip.min.js"></script>
-<!-- Новый фронтенд-скрипт -->
+<!-- наш скрипт -->
 <script src="{{ url_for('static', path='js/image_convert_multi.js') }}"></script>
 {% endblock %}
