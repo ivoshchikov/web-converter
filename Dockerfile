@@ -1,24 +1,25 @@
 # ──────────────── app/Dockerfile ────────────────
 FROM python:3.12-slim
 
-# ─── общие переменные окружения ─────────────────
+# ─── базовые переменные окружения ───────────────
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1         \
     PORT=8080                  \
     PATH="/root/.local/bin:$PATH"
 
-# ─── системные библиотеки для Pillow & co ───────
+# ─── Системные библиотеки для Pillow / reportlab ─
+#     без жёстких версий, чтобы работать и в bookworm, и в trixie
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        libjpeg62-turbo libjpeg62-turbo-dev   \
-        zlib1g-dev                            \
-        libwebp-dev                           \
-        libtiff5 libtiff-dev                  \
-        libopenjp2-7                          \
-        libfreetype6                          \
-        liblcms2-2                            \
+        libjpeg62-turbo-dev   \
+        zlib1g-dev            \
+        libwebp-dev           \
+        libtiff-dev           \
+        libopenjp2-7          \
+        libfreetype6          \
+        liblcms2-2            \
     && rm -rf /var/lib/apt/lists/*
 
-# ─── Python-dep’ы ───────────────────────────────
+# ─── Python-зависимости ─────────────────────────
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip \
@@ -27,9 +28,8 @@ RUN pip install --no-cache-dir --upgrade pip \
 # ─── проект ─────────────────────────────────────
 COPY . .
 
-# ─── Cloud Run → 8080 ───────────────────────────
+# ─── Cloud Run слушает 8080 ─────────────────────
 EXPOSE 8080
-
 CMD ["uvicorn","app.main:app",            \
      "--host","0.0.0.0","--port","8080", \
      "--proxy-headers",                  \
