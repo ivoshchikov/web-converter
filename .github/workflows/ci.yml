@@ -2,14 +2,15 @@ name: CI → Build → Cloud Run
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main                     # каждый push в main триггерит workflow
 
-env:                       # ← объявляем однажды и пользуемся внизу
-  REGION:      ${{ secrets.GCP_REGION }}
-  PROJECT_ID:  ${{ secrets.GCP_PROJECT }}
-  SERVICE:     web-converter-service
-  REPOSITORY:  web-converter-repo        # ваш AR-репозиторий
-  IMAGE_PATH:  ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/web-converter
+# ▸ переменные, которые будут доступны во ВСЕХ job-ах/шагах
+env:
+  REGION:      ${{ secrets.GCP_REGION }}          # пример: us-central1
+  PROJECT_ID:  ${{ secrets.GCP_PROJECT }}         # пример: burnished-yeti-406022
+  SERVICE:     web-converter-service              # имя Cloud Run-сервиса
+  REPOSITORY:  web-converter-repo                 # Artifact Registry repo (Docker)
 
 jobs:
   build-push-deploy:
@@ -19,19 +20,19 @@ jobs:
     - uses: actions/checkout@v3
 
     # ---------- аутентификация в Google Cloud ----------
-    - name: Auth to GCP
+    - name: Auth to Google Cloud
       uses: google-github-actions/auth@v1
       with:
         credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-    # ---------- сборка образа и пуш в Artifact Registry ----------
+    # ---------- сборка образа и push в Artifact Registry ----------
     - name: Build & push image
       uses: google-github-actions/build-push-action@v1
       with:
         push: true
         tags: |
-          ${{ env.IMAGE_PATH }}:${{ github.sha }}
-          ${{ env.IMAGE_PATH }}:latest           # скользящий тег
+          ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/web-converter:${{ github.sha }}
+          ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/web-converter:latest   # «скользящий» тег
 
     # ---------- деплой в Cloud Run ----------
     - name: Deploy to Cloud Run
@@ -39,5 +40,5 @@ jobs:
       with:
         service:  ${{ env.SERVICE }}
         region:   ${{ env.REGION }}
-        image:    ${{ env.IMAGE_PATH }}:latest   # всегда разворачиваем :latest
+        image:    ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/web-converter:latest
         allow_unauthenticated: true
