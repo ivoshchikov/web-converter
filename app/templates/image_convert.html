@@ -2,22 +2,41 @@
 {% set title = "Конвертер изображений" %}
 
 {% block content %}
-  <h1>Конвертер изображений</h1>
-  <form id="convert-form" enctype="multipart/form-data">
-    <input
-      type="file"
-      id="file-input"
-      name="file"
-      accept="image/*"
-      required
-    />
-    <select id="format-select" name="target_format">
-      <option value="jpeg">JPEG</option>
-      <option value="png">PNG</option>
-      <option value="webp" selected>WebP</option>
-    </select>
-    <button type="submit">Конвертировать</button>
-  </form>
-  <div id="result"></div>
-  <script src="/static/js/image_convert.js"></script>
+<div class="image-convert-container">
+  <div class="panel panel--files" id="files-panel">
+    <h2>Исходные файлы</h2>
+    <input type="file" id="file-input" name="files" accept="image/*" multiple />
+    <ul id="files-list"></ul>
+  </div>
+
+  <div class="panel panel--settings" id="settings-panel">
+    <h2>Параметры конвертации</h2>
+    <label>
+      Формат
+      <select id="format-select" name="target_format">
+        <option value="jpeg">JPEG</option>
+        <option value="png">PNG</option>
+        <option value="webp">WebP</option>
+        <option value="gif">GIF</option>
+        <option value="tiff">TIFF</option>
+      </select>
+    </label>
+    <label>
+      Качество (1–100)
+      <input type="number" id="quality-input" name="quality" min="1" max="100" value="80" />
+    </label>
+    <button id="convert-button">Конвертировать</button>
+  </div>
+
+  <div class="panel panel--results" id="results-panel">
+    <h2>Результаты</h2>
+    <ul id="results-list"></ul>
+    <a id="download-all" style="display:none">Скачать всё (.zip)</a>
+  </div>
+</div>
+
+<!-- JSZip для сборки ZIP-архива -->
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.0/dist/jszip.min.js"></script>
+<!-- Новый фронтенд-скрипт -->
+<script src="{{ url_for('static', path='js/image_convert_multi.js') }}"></script>
 {% endblock %}
