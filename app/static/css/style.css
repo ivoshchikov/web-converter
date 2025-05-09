@@ -86,4 +86,74 @@
   .site-footer a:hover {
     text-decoration: underline;
   }
+  .image-convert-container {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  .panel {
+    flex: 1;
+    background: #fff;
+    border: 1px solid #ddd;
+    padding: 1rem;
+    overflow-y: auto;
+  }
+  .panel--files  { max-width: 25%; }
+  .panel--settings { max-width: 25%; }
+  .panel--results  { flex: 1; }
+  #files-list, #results-list { list-style: none; padding: 0; }
+  #files-list li, #results-list li { margin: 0.5rem 0; }
+
+  /* Flex-layout для конвертера изображений */
+.image-convert-container {
+    display: flex;
+    flex-wrap: wrap;        /* чтобы не «ломалось» на узких экранах */
+    gap: 1rem;              /* расстояние между колонками */
+    padding: 1rem 0;        /* небольшой отступ сверху/снизу */
+  }
+  
+  .image-convert-container .panel {
+    background: #fff;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    padding: 1rem;
+    flex: 1 1 calc(33.333% - 1rem); /* три колонки с учётом gap */
+    min-width: 250px;               /* не слишком уж сжимать */
+  }
+  
+  /* Опционально, если хотите разный базовый размер колонок */
+  .panel--files    { flex: 1 1 25%; }
+  .panel--settings { flex: 1 1 35%; }
+  .panel--results  { flex: 1 1 40%; }
+  
+  /* Заголовки каждой панели чуть крупнее */
+  .panel h2 {
+    margin-bottom: 0.5rem;
+    font-size: 1.25rem;
+  }
+  
+  /* Списки файлов и результатов */
+  #files-list,
+  #results-list {
+    list-style: none;
+    margin-top: 0.5rem;
+  }
+  #files-list li,
+  #results-list li {
+    margin-bottom: 0.25rem;
+  }
+  /* --- site-wide --- */
+.site-content {
+    max-width: 1200px;   /* или 100%/90rem – на ваш вкус */
+  }
+  
+  /* --- layout only для страницы конвертера --- */
+  .image-convert-container .panel--files    { flex: 1 1 25%; min-width: 220px; }
+  .image-convert-container .panel--settings { flex: 1 1 30%; min-width: 250px; }
+  .image-convert-container .panel--results  { flex: 1 1 45%; }
+  
+  /* на узких экранах панели в столбик */
+  @media (max-width: 900px) {
+    .image-convert-container .panel { flex: 1 1 100%; }
+  }
   
